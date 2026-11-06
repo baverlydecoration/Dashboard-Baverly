@@ -234,7 +234,7 @@
     <button class="nav-btn" onclick="switchTab('tabOrders')">📝 Pesanan & Nota</button>
     <button class="nav-btn" onclick="switchTab('tabInventory')">📦 Gudang & Date-Lock</button>
     <button class="nav-btn" onclick="switchTab('tabFinance')">💰 Laporan & Kas</button>
-    <button class="nav-btn" onclick="switchTab('tabSettings')">⚙️ Pengaturan</button>
+    <button class="nav-btn" onclick="switchTab('tabSettings')">⚙️ Pengaturan Bisnis</button>
   </div>
 
   <main>
@@ -320,7 +320,7 @@
       </div>
     </section>
 
-    <!-- 4. TAB LAPORAN KEUANGAN, DIAGRAM & KOMPARASI -->
+    <!-- 4. TAB LAPORAN KEUANGAN & PENGELUARAN (BISA EDIT & HAPUS) -->
     <section id="tabFinance" class="tab-content">
       <!-- 4 Live Metrics -->
       <div class="metric-grid">
@@ -412,12 +412,13 @@
         </div>
       </div>
 
-      <!-- CATAT PENGELUARAN KASIR -->
+      <!-- FORM & TABEL PENGELUARAN KASIR (CRUD BISA EDIT & HAPUS) -->
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <h4 style="font-size:0.85rem; color:var(--primary-dark);">Catat Pengeluaran Kasir</h4>
+          <h4 id="expenseFormTitle" style="font-size:0.85rem; color:var(--primary-dark);">Catat Pengeluaran Kasir</h4>
           <button class="btn btn-secondary btn-sm" onclick="exportExpensesCSV()">📥 Export CSV</button>
         </div>
+        <input type="hidden" id="editExpId">
         <div class="form-row">
           <select id="expCategorySelect" class="form-control" style="flex:1;">
             <option value="Bunga Segar">🌸 Bunga Segar & Floral</option>
@@ -431,7 +432,10 @@
         <div class="form-group" style="margin-top:6px;">
           <input type="text" id="expDescInput" class="form-control" placeholder="Keterangan (contoh: Mawar peach & aster putih Plataran)">
         </div>
-        <button class="btn btn-primary" style="width:100%; padding:8px;" onclick="saveExpense()">- Catat Pengeluaran Kasir</button>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-primary" id="btnSaveExpense" style="flex:1; padding:8px;" onclick="saveExpense()">- Simpan Pengeluaran</button>
+          <button class="btn btn-secondary" id="btnCancelEditExpense" style="display:none; padding:8px;" onclick="cancelEditExpense()">Batal Edit</button>
+        </div>
 
         <div class="table-responsive" style="margin-top:12px;">
           <table>
@@ -441,6 +445,7 @@
                 <th>Kategori / Deskripsi</th>
                 <th>Nominal</th>
                 <th>Dicatat Oleh</th>
+                <th>Aksi</th>
               </tr>
             </thead>
             <tbody id="expensesTableBody"></tbody>
@@ -449,29 +454,42 @@
       </div>
     </section>
 
-    <!-- 5. TAB PENGATURAN -->
+    <!-- 5. TAB PENGATURAN BISNIS (EDIT HEADER & FOOTER NOTA) -->
     <section id="tabSettings" class="tab-content">
       <div class="card">
-        <div class="card-title">Profil Rekening & Bisnis</div>
-        <div class="form-group">
-          <label>Rekening Bank Resmi:</label>
-          <input type="text" id="setBankDetails" class="form-control">
+        <div class="card-title">Profil Bisnis & Template Nota Resmi</div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">
+          Ubah header kontak, rekening pembayaran, atau syarat & ketentuan nota. Semua perubahan akan langsung terupdate di cetak PDF dan WhatsApp.
+        </p>
+        
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label>Nomor WhatsApp di Header Nota:</label>
+            <input type="text" id="setWaNumber" class="form-control" placeholder="Contoh: 0851-6367-2392">
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Instagram di Header Nota:</label>
+            <input type="text" id="setIgAccount" class="form-control" placeholder="Contoh: @baverlydecoration">
+          </div>
         </div>
+
         <div class="form-group">
-          <label>Nomor WhatsApp Bisnis:</label>
-          <input type="text" id="setWaNumber" class="form-control">
+          <label>Teks Rekening Pembayaran Resmi (Footer Nota):</label>
+          <input type="text" id="setBankDetails" class="form-control" placeholder="Contoh: BCA (Bank Central Asia) 8465123908 a.n Bella / Vira (Baverly Decoration)">
         </div>
+
         <div class="form-group">
-          <label>Syarat & Ketentuan Sewa:</label>
-          <textarea id="setTerms" class="form-control" rows="3"></textarea>
+          <label>Syarat & Ketentuan Sewa (T&C di Bagian Bawah Nota):</label>
+          <textarea id="setTerms" class="form-control" rows="4" placeholder="Tuliskan butir syarat & ketentuan nota..."></textarea>
         </div>
-        <button class="btn btn-primary" onclick="saveSettings()">Simpan Pengaturan</button>
+
+        <button class="btn btn-primary" style="width:100%; padding:10px;" onclick="saveSettings()">Simpan Pengaturan Nota & Bisnis</button>
       </div>
 
       <div class="card">
         <div class="card-title">Sinkronisasi Cloud Supabase</div>
         <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-          Sistem otomatis tersinkronisasi antar-perangkat secara realtime.
+          Data otomatis tersinkronisasi antar-perangkat secara realtime dengan database Supabase.
         </p>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button class="btn btn-secondary" onclick="fetchFromSupabase()">🔄 Tarik Pembaruan Cloud</button>
@@ -591,7 +609,10 @@
           <div>
             <div class="inv-brand">Baverly</div>
             <div class="inv-sub">FLORIST & DECORATION</div>
-            <div class="inv-tagline">Boutique Event & Table Setting Decoration<br>WhatsApp: 0851-6367-2392 • Instagram: @baverlydecoration</div>
+            <!-- Subteks Boutique Event & Table Setting DIHAPUS SESUAI PERMINTAAN -->
+            <div class="inv-tagline">
+              WhatsApp: <span id="invHeaderWa">0851-6367-2392</span> • Instagram: <span id="invHeaderIg">@baverlydecoration</span>
+            </div>
           </div>
           <div style="text-align:right;">
             <div style="font-size:0.85rem; font-weight:700; color:#82433b;">OFFICIAL INVOICE</div>
@@ -646,18 +667,17 @@
 
         <div class="inv-bank-box">
           <div style="font-size:0.62rem; font-weight:700; color:#736967;">REKENING PEMBAYARAN RESMI:</div>
-          <div style="font-weight:700; color:#332d2c; margin-top:2px;">BCA (Bank Central Asia) 8465123908</div>
-          <div style="color:#736967;">a.n Bella / Vira (Baverly Decoration)</div>
+          <div id="invBankDisplay" style="font-weight:700; color:#332d2c; margin-top:2px;">BCA (Bank Central Asia) 8465123908 a.n Bella / Vira (Baverly Decoration)</div>
         </div>
 
         <div style="margin-top:10px; font-size:0.65rem; color:#736967; line-height:1.3;">
           <strong style="color:#332d2c;">SYARAT & KETENTUAN SEWA:</strong>
-          <ol style="margin-left:14px; margin-top:2px;">
-            <li>DP minimal 30% bersifat non-refundable (tidak dapat dikembalikan bila batal).</li>
-            <li>Pelunasan wajib diselesaikan maksimal H-1 sebelum waktu pemasangan dekorasi.</li>
-            <li>Kerusakan atau kehilangan barang sewa di venue menjadi tanggung jawab penyewa.</li>
-            <li>Jam pemasangan (setup) toleransi maksimal 2-3 jam sebelum acara dimulai.</li>
-          </ol>
+          <div id="invTermsDisplay" style="margin-top:2px; white-space:pre-line;">
+            1. DP minimal 30% bersifat non-refundable (tidak dapat dikembalikan bila batal).
+            2. Pelunasan wajib diselesaikan maksimal H-1 sebelum waktu pemasangan dekorasi.
+            3. Kerusakan atau kehilangan barang sewa di venue menjadi tanggung jawab penyewa.
+            4. Jam pemasangan (setup) toleransi maksimal 2-3 jam sebelum acara dimulai.
+          </div>
         </div>
 
         <div id="invAuditTrailText" style="margin-top:8px; font-size:0.62rem; color:#9c9593; text-align:right;"></div>
@@ -748,15 +768,16 @@
       ],
       settings: {
         bankDetails: "BCA (Bank Central Asia) 8465123908 a.n Bella / Vira (Baverly Decoration)",
-        waNumber: "085163672392",
-        terms: "1. DP minimal 30% bersifat non-refundable.\n2. Pelunasan H-1 acara.\n3. Kerusakan barang sewa ditanggung penyewa."
+        waNumber: "0851-6367-2392",
+        igAccount: "@baverlydecoration",
+        terms: "1. DP minimal 30% bersifat non-refundable (tidak dapat dikembalikan bila batal).\n2. Pelunasan wajib diselesaikan maksimal H-1 sebelum waktu pemasangan dekorasi.\n3. Kerusakan atau kehilangan barang sewa di venue menjadi tanggung jawab penyewa.\n4. Jam pemasangan (setup) toleransi maksimal 2-3 jam sebelum acara dimulai."
       }
     };
 
     window.addEventListener("DOMContentLoaded", () => {
       loadLocalStorage();
       fetchFromSupabase();
-      setInterval(fetchFromSupabase, 15000); // Polling otomatis tiap 15 detik
+      setInterval(fetchFromSupabase, 15000);
     });
 
     function renderAll() {
@@ -967,13 +988,11 @@
       });
     }
 
-    // FUNGSI HAPUS NOTA
     function deleteOrder(orderId) {
       const order = appData.orders.find(o => o.id === orderId);
       if (!order) return;
 
-      const confirmDelete = confirm(`Apakah kamu yakin ingin menghapus nota "${order.clientName}" (${order.id})?\n\nCatatan: Data yang dihapus akan otomatis tersinkronisasi ke perangkat lain.`);
-      if (confirmDelete) {
+      if (confirm(`Apakah yakin ingin menghapus nota "${order.clientName}" (${order.id})?`)) {
         appData.orders = appData.orders.filter(o => o.id !== orderId);
         saveLocalStorage();
         renderAll();
@@ -1130,7 +1149,7 @@
       }
     }
 
-    // --- PRATINJAU NOTA RESMI ---
+    // --- PRATINJAU NOTA RESMI DINAMIS ---
     function openInvoicePreview(orderId) {
       activePreviewOrderId = orderId;
       const order = appData.orders.find(o => o.id === orderId);
@@ -1142,6 +1161,10 @@
       const total = safeItems.reduce((acc, it) => acc + Number(it.price || 0), 0);
       const paid = safePayments.reduce((acc, p) => acc + Number(p.amount || 0), 0);
       const remaining = Math.max(0, total - paid);
+
+      // Header kontak dinamis dari pengaturan
+      document.getElementById("invHeaderWa").innerText = appData.settings.waNumber || "0851-6367-2392";
+      document.getElementById("invHeaderIg").innerText = appData.settings.igAccount || "@baverlydecoration";
 
       document.getElementById("invCodeLabel").innerText = order.id;
       document.getElementById("invDateLabel").innerText = `Tanggal: ${order.eventDate}`;
@@ -1167,6 +1190,11 @@
       document.getElementById("invTotalContract").innerText = `Rp ${total.toLocaleString('id-ID')}`;
       document.getElementById("invTotalPaid").innerText = `Rp ${paid.toLocaleString('id-ID')}`;
       document.getElementById("invRemainingPay").innerText = `Rp ${remaining.toLocaleString('id-ID')}`;
+      
+      // Footer rekening & T&C dinamis
+      document.getElementById("invBankDisplay").innerText = appData.settings.bankDetails;
+      document.getElementById("invTermsDisplay").innerText = appData.settings.terms;
+
       document.getElementById("invAuditTrailText").innerText = `Dibuat oleh: ${order.createdBy || 'Owner'} | Terakhir diedit: ${order.lastEditedBy || '-'}`;
 
       openModal("previewInvoiceModal");
@@ -1198,6 +1226,9 @@ ${(order.items || []).map(it => `• ${it.desc} (Rp ${Number(it.price).toLocaleS
 
 *Rekening Pembayaran:*
 ${appData.settings.bankDetails}
+
+*Syarat & Ketentuan:*
+${appData.settings.terms}
 
 Terima kasih atas kepercayaannya! ✨`;
 
@@ -1369,7 +1400,7 @@ Terima kasih atas kepercayaannya! ✨`;
       renderInventory();
     }
 
-    // --- TAB LAPORAN KEUANGAN, DIAGRAM & HPP ---
+    // --- TAB KEUANGAN & CRUD PENGELUARAN ---
     function renderFinanceTab() {
       const selectMonthEl = document.getElementById("financeMonthSelect");
       const selectedMonth = selectMonthEl ? selectMonthEl.value : "2026-11";
@@ -1409,6 +1440,10 @@ Terima kasih atas kepercayaannya! ✨`;
                 <td><strong>${e.category}</strong><br><span style="color:var(--text-muted); font-size:0.7rem;">${e.desc}</span></td>
                 <td style="color:var(--danger); font-weight:700;">-Rp ${Number(e.amount).toLocaleString('id-ID')}</td>
                 <td>${e.by || 'Owner'}</td>
+                <td>
+                  <button class="btn btn-secondary btn-sm" onclick="editExpense('${e.id}')">✏️</button>
+                  <button class="btn btn-danger btn-sm" onclick="deleteExpense('${e.id}')">🗑️</button>
+                </td>
               </tr>
             `;
           }
@@ -1471,7 +1506,9 @@ Terima kasih atas kepercayaannya! ✨`;
       }
     }
 
+    // FUNGSI CRUD PENGELUARAN (SIMPAN, EDIT, HAPUS)
     function saveExpense() {
+      const expId = document.getElementById("editExpId").value;
       const desc = document.getElementById("expDescInput").value.trim();
       const cat = document.getElementById("expCategorySelect").value;
       const amount = Number(document.getElementById("expAmountInput").value || 0);
@@ -1483,17 +1520,69 @@ Terima kasih atas kepercayaannya! ✨`;
       }
 
       if (!Array.isArray(appData.expenses)) appData.expenses = [];
-      appData.expenses.unshift({
-        id: `EXP-${Date.now().toString().slice(-4)}`,
-        desc, category: cat, amount,
-        date: `${selectedMonth}-06`,
-        by: activeOwner
-      });
 
-      document.getElementById("expDescInput").value = "";
-      document.getElementById("expAmountInput").value = "";
+      if (expId) {
+        // Mode Edit Pengeluaran
+        const item = appData.expenses.find(e => e.id === expId);
+        if (item) {
+          item.desc = desc;
+          item.category = cat;
+          item.amount = amount;
+          item.by = `${activeOwner} (edit)`;
+        }
+        cancelEditExpense();
+      } else {
+        // Mode Tambah Baru
+        appData.expenses.unshift({
+          id: `EXP-${Date.now().toString().slice(-4)}`,
+          desc, category: cat, amount,
+          date: `${selectedMonth}-06`,
+          by: activeOwner
+        });
+        document.getElementById("expDescInput").value = "";
+        document.getElementById("expAmountInput").value = "";
+      }
+
       saveLocalStorage();
       renderFinanceTab();
+      alert("Pengeluaran kas berhasil disimpan!");
+    }
+
+    function editExpense(expId) {
+      const exp = appData.expenses.find(e => e.id === expId);
+      if (!exp) return;
+
+      document.getElementById("editExpId").value = exp.id;
+      document.getElementById("expDescInput").value = exp.desc;
+      document.getElementById("expCategorySelect").value = exp.category;
+      document.getElementById("expAmountInput").value = exp.amount;
+
+      document.getElementById("expenseFormTitle").innerText = `Edit Pengeluaran (${exp.id})`;
+      document.getElementById("btnSaveExpense").innerText = "Simpan Perubahan Pengeluaran";
+      document.getElementById("btnCancelEditExpense").style.display = "inline-flex";
+
+      // Scroll halus ke form
+      document.getElementById("expDescInput").scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function cancelEditExpense() {
+      document.getElementById("editExpId").value = "";
+      document.getElementById("expDescInput").value = "";
+      document.getElementById("expAmountInput").value = "";
+      document.getElementById("expenseFormTitle").innerText = "Catat Pengeluaran Kasir";
+      document.getElementById("btnSaveExpense").innerText = "- Simpan Pengeluaran";
+      document.getElementById("btnCancelEditExpense").style.display = "none";
+    }
+
+    function deleteExpense(expId) {
+      const exp = appData.expenses.find(e => e.id === expId);
+      if (!exp) return;
+
+      if (confirm(`Hapus catatan pengeluaran "${exp.desc}" (-Rp ${exp.amount.toLocaleString('id-ID')})?`)) {
+        appData.expenses = appData.expenses.filter(e => e.id !== expId);
+        saveLocalStorage();
+        renderFinanceTab();
+      }
     }
 
     function loadHppData() {
@@ -1540,19 +1629,24 @@ Terima kasih atas kepercayaannya! ✨`;
       a.click();
     }
 
-    // --- PENGATURAN & BACKUP ---
+    // --- PENGATURAN BISNIS LENGKAP (HEADER, REKENING & FOOTER NOTA) ---
     function loadSettings() {
-      document.getElementById("setBankDetails").value = appData.settings.bankDetails || "";
-      document.getElementById("setWaNumber").value = appData.settings.waNumber || "";
+      if (!appData.settings) appData.settings = {};
+      document.getElementById("setWaNumber").value = appData.settings.waNumber || "0851-6367-2392";
+      document.getElementById("setIgAccount").value = appData.settings.igAccount || "@baverlydecoration";
+      document.getElementById("setBankDetails").value = appData.settings.bankDetails || "BCA (Bank Central Asia) 8465123908 a.n Bella / Vira (Baverly Decoration)";
       document.getElementById("setTerms").value = appData.settings.terms || "";
     }
 
     function saveSettings() {
-      appData.settings.bankDetails = document.getElementById("setBankDetails").value.trim();
+      if (!appData.settings) appData.settings = {};
       appData.settings.waNumber = document.getElementById("setWaNumber").value.trim();
+      appData.settings.igAccount = document.getElementById("setIgAccount").value.trim();
+      appData.settings.bankDetails = document.getElementById("setBankDetails").value.trim();
       appData.settings.terms = document.getElementById("setTerms").value.trim();
+
       saveLocalStorage();
-      alert("Pengaturan rekening & T&C berhasil disimpan!");
+      alert("Pengaturan profil & template nota berhasil disimpan! Data langsung terupdate di cetak nota dan WhatsApp.");
     }
 
     function exportDataJson() {
