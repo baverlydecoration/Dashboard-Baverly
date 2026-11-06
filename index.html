@@ -52,7 +52,7 @@
     }
     .brand-title {
       font-family: "Playfair Display", Georgia, serif;
-      font-size: 1.4rem; font-weight: 700; color: #b6746a; letter-spacing: -0.5px; line-height: 1;
+      font-size: 1.35rem; font-weight: 700; color: #b6746a; letter-spacing: -0.5px; line-height: 1;
     }
     .brand-sub {
       font-size: 0.58rem; letter-spacing: 2.5px; text-transform: uppercase;
@@ -142,8 +142,8 @@
     
     .chart-container { display: flex; align-items: flex-end; gap: 12px; height: 130px; padding: 10px 0; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
     .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
-    .chart-bar { width: 85%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.3s; }
-    .chart-label { font-size: 0.65rem; color: var(--text-muted); margin-top: 6px; text-align: center; }
+    .chart-bar { width: 80%; border-radius: 4px 4px 0 0; min-height: 6px; transition: height 0.4s; }
+    .chart-label { font-size: 0.68rem; color: var(--text-muted); margin-top: 6px; text-align: center; font-weight: 600; }
 
     /* Modals */
     .modal-overlay {
@@ -165,7 +165,7 @@
     .modal-title { font-size: 0.95rem; font-weight: 700; color: var(--primary-dark); }
     .close-btn { font-size: 1.2rem; cursor: pointer; border: none; background: none; color: var(--text-muted); }
 
-    /* Official Invoice Modal Styling */
+    /* Official Invoice Template */
     .inv-official-card {
       background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 18px; font-size: 0.8rem;
     }
@@ -231,9 +231,9 @@
   <!-- NAV TABS -->
   <div class="nav-tabs">
     <button class="nav-btn active" onclick="switchTab('tabCalendar')">📅 Jadwal & Story</button>
-    <button class="nav-btn" onclick="switchTab('tabOrders')">📝 Nota & Booking</button>
-    <button class="nav-btn" onclick="switchTab('tabInventory')">📦 Stok Gudang</button>
-    <button class="nav-btn" onclick="switchTab('tabFinance')">💰 Kas & Diagram</button>
+    <button class="nav-btn" onclick="switchTab('tabOrders')">📝 Pesanan & Nota</button>
+    <button class="nav-btn" onclick="switchTab('tabInventory')">📦 Gudang & Date-Lock</button>
+    <button class="nav-btn" onclick="switchTab('tabFinance')">💰 Laporan & Kas</button>
     <button class="nav-btn" onclick="switchTab('tabSettings')">⚙️ Pengaturan</button>
   </div>
 
@@ -271,21 +271,21 @@
       </div>
     </section>
 
-    <!-- 2. TAB NOTA & PESANAN -->
+    <!-- 2. TAB NOTA & PESANAN (RIWAYAT LENGKAP) -->
     <section id="tabOrders" class="tab-content">
       <div class="card">
         <div class="card-title">
-          <span>Daftar Pemesanan & Nota</span>
-          <button class="btn btn-primary btn-sm" onclick="openOrderModal()">+ Buat Nota Baru</button>
+          <span>Riwayat Pesanan & Nota Klien</span>
+          <button class="btn btn-primary btn-sm" onclick="openOrderModal()">+ Tambah Pesanan / Nota</button>
         </div>
         <div class="table-responsive">
           <table>
             <thead>
               <tr>
                 <th>Klien & Venue</th>
-                <th>Tanggal</th>
-                <th>Total</th>
-                <th>Status</th>
+                <th>Tgl Acara</th>
+                <th>Total Kontrak</th>
+                <th>Status Pembayaran</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -310,7 +310,7 @@
                 <th>Nama Barang & Rak</th>
                 <th>Total</th>
                 <th>Laundry</th>
-                <th>Siap</th>
+                <th>Siap Sewa</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -320,136 +320,141 @@
       </div>
     </section>
 
-    <!-- 4. TAB LAPORAN KEUANGAN & DIAGRAM -->
+    <!-- 4. TAB LAPORAN KEUANGAN, DIAGRAM & KOMPARASI -->
     <section id="tabFinance" class="tab-content">
+      <!-- 4 Live Metrics -->
+      <div class="metric-grid">
+        <div class="metric-box">
+          <div class="metric-title">Total Kas Masuk</div>
+          <div class="metric-val" id="metricCashIn" style="color:var(--success);">Rp 0</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-title">Total Kas Keluar</div>
+          <div class="metric-val" id="metricCashOut" style="color:var(--danger);">Rp 0</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-title">Laba Bersih Kas</div>
+          <div class="metric-val" id="metricNetProfit">Rp 0</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-title">Total Sisa Piutang</div>
+          <div class="metric-val" id="metricReceivables">Rp 0</div>
+        </div>
+      </div>
+
+      <!-- FILTER BULAN & DIAGRAM BATANG -->
       <div class="card">
         <div class="card-title">
-          <span>Filter Periode Buku Kas</span>
-          <select id="financeMonthFilter" class="form-control" style="width:auto;" onchange="renderFinance()">
+          <span>📊 Diagram Arus Kas & Komparasi Bulanan</span>
+          <select id="financeMonthSelect" class="form-control" style="width:auto; padding:4px 8px; font-size:0.75rem;" onchange="renderFinanceTab()">
             <option value="2026-11">November 2026</option>
             <option value="2026-10">Oktober 2026</option>
             <option value="2026-09">September 2026</option>
           </select>
         </div>
 
-        <!-- 4 Live Metrics -->
-        <div class="metric-grid">
-          <div class="metric-box">
-            <div class="metric-title">Kas Masuk Riil</div>
-            <div class="metric-val" id="metricCashIn">Rp 0</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-title">Kas Keluar Ops</div>
-            <div class="metric-val" id="metricCashOut">Rp 0</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-title">Laba Bersih Kas</div>
-            <div class="metric-val" id="metricNetProfit">Rp 0</div>
-          </div>
-          <div class="metric-box">
-            <div class="metric-title">Sisa Piutang Klien</div>
-            <div class="metric-val" id="metricReceivables">Rp 0</div>
-          </div>
+        <div style="background:var(--primary-light); border:1px solid var(--border); border-radius:8px; padding:8px 12px; margin-bottom:12px; font-size:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+          <span>Performa vs Bulan Sebelumnya:</span>
+          <strong id="growthBadge" style="color:var(--success);">Memuat komparasi...</strong>
         </div>
 
-        <!-- Diagram Arus Kas & Komparasi -->
-        <p style="font-size:0.75rem; font-weight:700; color:var(--primary-dark); margin:10px 0 4px;">Diagram Arus Kas Periode Terpilih:</p>
         <div class="chart-container">
           <div class="chart-bar-wrap">
-            <div id="chartBarIn" class="chart-bar" style="background:#15803d; height:10%;"></div>
+            <span id="barValIn" style="font-size:0.65rem; font-weight:700; color:var(--success); margin-bottom:4px;">Rp 0</span>
+            <div id="barIn" class="chart-bar" style="background:var(--success); height:40%;"></div>
             <span class="chart-label">Kas Masuk</span>
           </div>
           <div class="chart-bar-wrap">
-            <div id="chartBarOut" class="chart-bar" style="background:#d32f2f; height:10%;"></div>
+            <span id="barValOut" style="font-size:0.65rem; font-weight:700; color:var(--danger); margin-bottom:4px;">Rp 0</span>
+            <div id="barOut" class="chart-bar" style="background:var(--danger); height:20%;"></div>
             <span class="chart-label">Kas Keluar</span>
           </div>
           <div class="chart-bar-wrap">
-            <div id="chartBarProfit" class="chart-bar" style="background:#c47c72; height:10%;"></div>
+            <span id="barValProfit" style="font-size:0.65rem; font-weight:700; color:var(--primary); margin-bottom:4px;">Rp 0</span>
+            <div id="barProfit" class="chart-bar" style="background:var(--primary); height:50%;"></div>
             <span class="chart-label">Laba Bersih</span>
           </div>
         </div>
+      </div>
 
-        <div style="background:var(--primary-light); padding:8px 12px; border-radius:8px; border:1px solid var(--border); margin-bottom:14px; font-size:0.75rem;">
-          <strong>Komparasi Bulan Ini vs Bulan Lalu:</strong>
-          <span id="monthCompareResult" style="margin-left:6px; font-weight:600;">Memuat analisis...</span>
+      <!-- KALKULATOR HPP -->
+      <div class="card">
+        <div class="card-title">
+          <span>📐 Kalkulator HPP Mandiri per Acara</span>
         </div>
-
-        <!-- Kalkulator HPP -->
-        <div style="border-top:1px dashed var(--border); padding-top:12px; margin-top:12px;">
-          <h4 style="font-size:0.85rem; color:var(--primary-dark); margin-bottom:8px;">📐 Kalkulator HPP Mandiri per Acara</h4>
-          <div class="form-group">
-            <label>Pilih Acara / Nota:</label>
-            <select id="hppOrderSelect" class="form-control" onchange="loadHppData()"></select>
+        <div class="form-group">
+          <label>Pilih Acara / Nota:</label>
+          <select id="hppOrderSelect" class="form-control" onchange="loadHppData()"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label>Bunga Segar (Rp):</label>
+            <input type="number" id="hppFlowerCost" class="form-control" value="0" oninput="calcHpp()">
           </div>
-          <div class="form-row">
-            <div class="form-group" style="flex:1;">
-              <label>Bunga Segar (Rp):</label>
-              <input type="number" id="hppFlowerCost" class="form-control" value="0" oninput="calcHpp()">
-            </div>
-            <div class="form-group" style="flex:1;">
-              <label>Honor Crew (Rp):</label>
-              <input type="number" id="hppCrewCost" class="form-control" value="0" oninput="calcHpp()">
-            </div>
-          </div>
-          <div class="form-row">
-            <div class="form-group" style="flex:1;">
-              <label>Bensin / Transport (Rp):</label>
-              <input type="number" id="hppTransportCost" class="form-control" value="0" oninput="calcHpp()">
-            </div>
-            <div class="form-group" style="flex:1;">
-              <label>Laundry / Cadangan (Rp):</label>
-              <input type="number" id="hppLaundryCost" class="form-control" value="0" oninput="calcHpp()">
-            </div>
-          </div>
-          <div style="background:#fff; border:1px solid var(--border); padding:8px; border-radius:6px; display:flex; justify-content:space-between; font-size:0.78rem; font-weight:700;">
-            <span>Estimasi Laba Bersih Event:</span>
-            <span id="hppNetResult" style="color:var(--success);">Rp 0 (0%)</span>
+          <div class="form-group" style="flex:1;">
+            <label>Honor Crew (Rp):</label>
+            <input type="number" id="hppCrewCost" class="form-control" value="0" oninput="calcHpp()">
           </div>
         </div>
-
-        <!-- Input Pengeluaran Kasir -->
-        <div style="border-top:1px dashed var(--border); padding-top:12px; margin-top:12px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <h4 style="font-size:0.85rem; color:var(--primary-dark);">Catat Pengeluaran Kas Operasional</h4>
-            <button class="btn btn-secondary btn-sm" onclick="exportExpensesCSV()">📥 Ekspor CSV</button>
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label>Bensin / Transport (Rp):</label>
+            <input type="number" id="hppTransportCost" class="form-control" value="0" oninput="calcHpp()">
           </div>
-          <div class="form-row">
-            <input type="text" id="expDescInput" class="form-control" placeholder="Keterangan..." style="flex:2;">
-            <select id="expCategorySelect" class="form-control" style="flex:1;">
-              <option value="Bunga Segar">Bunga Segar</option>
-              <option value="Crew">Crew</option>
-              <option value="Transport">Bensin/Tol</option>
-              <option value="Laundry">Laundry</option>
-              <option value="Alat Gudang">Alat Gudang</option>
-            </select>
-            <input type="number" id="expAmountInput" class="form-control" placeholder="Rp..." style="flex:1;">
-            <button class="btn btn-primary btn-sm" onclick="saveExpense()">+ Catat</button>
-          </div>
-          <div class="table-responsive" style="margin-top:10px;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Tgl</th>
-                  <th>Keterangan</th>
-                  <th>Kategori</th>
-                  <th>Nominal</th>
-                  <th>Oleh</th>
-                </tr>
-              </thead>
-              <tbody id="expensesTableBody"></tbody>
-            </table>
+          <div class="form-group" style="flex:1;">
+            <label>Laundry / Cadangan (Rp):</label>
+            <input type="number" id="hppLaundryCost" class="form-control" value="0" oninput="calcHpp()">
           </div>
         </div>
+        <div style="background:#fff; border:1px solid var(--border); padding:8px 12px; border-radius:6px; display:flex; justify-content:space-between; font-size:0.78rem; font-weight:700;">
+          <span>Estimasi Laba Bersih Event:</span>
+          <span id="hppNetResult" style="color:var(--success);">Rp 0 (0%)</span>
+        </div>
+      </div>
 
+      <!-- CATAT PENGELUARAN KASIR -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:0.85rem; color:var(--primary-dark);">Catat Pengeluaran Kasir</h4>
+          <button class="btn btn-secondary btn-sm" onclick="exportExpensesCSV()">📥 Export CSV</button>
+        </div>
+        <div class="form-row">
+          <select id="expCategorySelect" class="form-control" style="flex:1;">
+            <option value="Bunga Segar">🌸 Bunga Segar & Floral</option>
+            <option value="Transport & Bensin">🚚 Transport & Bensin</option>
+            <option value="Honor Crew">👥 Honor Crew Freelance</option>
+            <option value="Laundry & Perawatan">🧺 Laundry & Perawatan</option>
+            <option value="Alat & Perlengkapan">📦 Alat & Perlengkapan</option>
+          </select>
+          <input type="number" id="expAmountInput" class="form-control" placeholder="Nominal Rp..." style="flex:1;">
+        </div>
+        <div class="form-group" style="margin-top:6px;">
+          <input type="text" id="expDescInput" class="form-control" placeholder="Keterangan (contoh: Mawar peach & aster putih Plataran)">
+        </div>
+        <button class="btn btn-primary" style="width:100%; padding:8px;" onclick="saveExpense()">- Catat Pengeluaran Kasir</button>
+
+        <div class="table-responsive" style="margin-top:12px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Tgl</th>
+                <th>Kategori / Deskripsi</th>
+                <th>Nominal</th>
+                <th>Dicatat Oleh</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTableBody"></tbody>
+          </table>
+        </div>
       </div>
     </section>
 
     <!-- 5. TAB PENGATURAN -->
     <section id="tabSettings" class="tab-content">
       <div class="card">
-        <div class="card-title">Profil Bisnis & Rekening Nota</div>
+        <div class="card-title">Profil Rekening & Bisnis</div>
         <div class="form-group">
-          <label>Rekening Bank (Contoh: BCA 8465123908 a.n Bella / Vira):</label>
+          <label>Rekening Bank Resmi:</label>
           <input type="text" id="setBankDetails" class="form-control">
         </div>
         <div class="form-group">
@@ -457,7 +462,7 @@
           <input type="text" id="setWaNumber" class="form-control">
         </div>
         <div class="form-group">
-          <label>Syarat & Ketentuan Nota (T&C):</label>
+          <label>Syarat & Ketentuan Sewa:</label>
           <textarea id="setTerms" class="form-control" rows="3"></textarea>
         </div>
         <button class="btn btn-primary" onclick="saveSettings()">Simpan Pengaturan</button>
@@ -466,7 +471,7 @@
       <div class="card">
         <div class="card-title">Sinkronisasi Cloud Supabase</div>
         <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:10px;">
-          Setiap transaksi otomatis tersinkronisasi ke cloud Supabase secara riil antar-perangkat.
+          Sistem otomatis tersinkronisasi antar-perangkat secara realtime.
         </p>
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
           <button class="btn btn-secondary" onclick="fetchFromSupabase()">🔄 Tarik Pembaruan Cloud</button>
@@ -477,7 +482,7 @@
     </section>
   </main>
 
-  <!-- MODAL: ORDER FORM -->
+  <!-- MODAL: ORDER FORM (BUAT & EDIT NOTA) -->
   <div class="modal-overlay" id="orderModal">
     <div class="modal-card">
       <div class="modal-header">
@@ -486,13 +491,13 @@
       </div>
       <input type="hidden" id="editOrderId">
       <div class="form-group">
-        <label>Nama Klien:</label>
+        <label>Nama Klien / Pemesan:</label>
         <input type="text" id="orderClientName" class="form-control" placeholder="Contoh: Kak Intan Nurul">
       </div>
       <div class="form-row">
         <div class="form-group" style="flex:1;">
           <label>WhatsApp:</label>
-          <input type="text" id="orderClientPhone" class="form-control" placeholder="0851...">
+          <input type="text" id="orderClientPhone" class="form-control" placeholder="085163672392">
         </div>
         <div class="form-group" style="flex:1;">
           <label>Tanggal Acara:</label>
@@ -502,20 +507,20 @@
       <div class="form-row">
         <div class="form-group" style="flex:1;">
           <label>Jam Setup:</label>
-          <input type="time" id="orderSetupTime" class="form-control">
+          <input type="time" id="orderSetupTime" class="form-control" value="15:00">
         </div>
         <div class="form-group" style="flex:1;">
           <label>Jam Acara / Selesai:</label>
-          <input type="text" id="orderEventTimeRange" class="form-control" placeholder="18:00 - 21:30">
+          <input type="text" id="orderEventTimeRange" class="form-control" placeholder="18:00 • Selesai: 21:30" value="18:00 • Selesai: 21:30">
         </div>
       </div>
       <div class="form-group">
-        <label>Venue / Lokasi:</label>
+        <label>Venue / Lokasi Acara:</label>
         <input type="text" id="orderVenue" class="form-control" placeholder="Contoh: Plataran Resto, Private Room Lt.2">
       </div>
       <div class="form-group">
         <label>Catatan PIC / Venue:</label>
-        <textarea id="orderPicNotes" class="form-control" rows="2" placeholder="Akses tangga darurat, stop kontak di pilar barat..."></textarea>
+        <textarea id="orderPicNotes" class="form-control" rows="2" placeholder="Contoh: Akses tangga darurat lantai 2, colokan listrik di sisi pilar barat"></textarea>
       </div>
 
       <div class="form-group">
@@ -567,7 +572,7 @@
     </div>
   </div>
 
-  <!-- MODAL: PRATINJAU NOTA RESMI PERSIS GAMBAR -->
+  <!-- MODAL: PRATINJAU NOTA RESMI PERSIS DOKUMEN -->
   <div class="modal-overlay" id="previewInvoiceModal">
     <div class="modal-card" style="max-width:540px;">
       <div class="modal-header" style="border:none; padding-bottom:0;">
@@ -579,7 +584,7 @@
         </div>
       </div>
 
-      <!-- KARTU INVOICE RESMI -->
+      <!-- KARTU DOKUMEN FISIK NOTA RESMI -->
       <div class="inv-official-card" id="printableInvoiceArea" style="margin-top:10px;">
         <div class="inv-head-row">
           <div>
@@ -597,7 +602,7 @@
         <div class="inv-grid-box">
           <div>
             <div style="font-size:0.62rem; color:#736967; font-weight:700;">PEMESAN:</div>
-            <div id="invClientName" style="font-weight:700;">-</div>
+            <div id="invClientName" style="font-weight:700; color:#332d2c;">-</div>
             <div id="invClientPhone" style="color:#736967;">-</div>
           </div>
           <div>
@@ -696,7 +701,7 @@
   </div>
 
   <script>
-    // --- INTEGRASI SUPABASE RIIL ---
+    // --- INTEGRASI SUPABASE & STATE ---
     const SUPABASE_URL = "https://lvyihlivcnphkrvahyxs.supabase.co";
     const SUPABASE_KEY = "sb_publishable_ilDz22Y3PL-d4CTuy297qw_JEN7CBMs";
     const PIN_BELLA = "Cokro123";
@@ -709,12 +714,12 @@
     let appData = {
       orders: [
         {
-          id: "BV-2611-001",
+          id: "#BV-2611-001",
           clientName: "Kak Intan Nurul",
           phone: "085163672392",
           eventDate: "2026-11-12",
           setupTime: "15:00",
-          eventTimeRange: "18:00 - 21:30",
+          eventTimeRange: "18:00 • Selesai: 21:30",
           venue: "Plataran Resto, Private Room Lt.2",
           picNotes: "Akses tangga darurat lantai 2, colokan listrik di sisi pilar barat",
           items: [
@@ -737,13 +742,13 @@
         { id: "INV-3", name: "Arch Gate Rosewood", rack: "Gudang Belakang", total: 2, inLaundry: 0, photo: "" }
       ],
       expenses: [
-        { id: "EXP-1", desc: "Bunga Segar Mawar Pink & Gompie", category: "Bunga Segar", amount: 450000, date: "2026-11-05", by: "Bella" },
-        { id: "EXP-2", desc: "Biaya Pick Up & Bensin Venue", category: "Transport", amount: 100000, date: "2026-11-06", by: "Vira" }
+        { id: "EXP-1", desc: "Mawar peach & hydrangea Plataran", category: "Bunga Segar", amount: 450000, date: "2026-11-06", by: "Bella" },
+        { id: "EXP-2", desc: "Bensin pick-up dan tol loading resto", category: "Transport & Bensin", amount: 120000, date: "2026-11-06", by: "Vira" }
       ],
       settings: {
         bankDetails: "BCA (Bank Central Asia) 8465123908 a.n Bella / Vira (Baverly Decoration)",
         waNumber: "085163672392",
-        terms: "1. DP minimal 30% non-refundable.\n2. Pelunasan H-1 acara.\n3. Kerusakan barang sewa ditanggung penyewa."
+        terms: "1. DP minimal 30% bersifat non-refundable.\n2. Pelunasan H-1 acara.\n3. Kerusakan barang sewa ditanggung penyewa."
       }
     };
 
@@ -757,7 +762,7 @@
       renderCalendar();
       renderOrders();
       renderInventory();
-      renderFinance();
+      renderFinanceTab();
       loadSettings();
     }
 
@@ -853,16 +858,21 @@
     }
 
     function updateSyncBadge(text) {
-      document.getElementById("cloudSyncIndicator").innerText = text;
+      const badge = document.getElementById("cloudSyncIndicator");
+      if (badge) badge.innerText = text;
     }
 
-    // --- CALENDAR ---
+    // --- KALENDER & STORY ---
     function renderCalendar() {
       const grid = document.getElementById("calendarDaysGrid");
+      if (!grid) return;
       grid.innerHTML = "";
+      
+      const orders = Array.isArray(appData.orders) ? appData.orders : [];
+
       for (let day = 1; day <= 30; day++) {
         const dateStr = `2026-11-${String(day).padStart(2, "0")}`;
-        const dayOrders = appData.orders.filter(o => o.eventDate === dateStr);
+        const dayOrders = orders.filter(o => o.eventDate === dateStr);
         
         const el = document.createElement("div");
         el.className = "calendar-day";
@@ -874,17 +884,17 @@
         let pillsHtml = "";
         dayOrders.forEach(o => {
           const isPaid = o.paymentStatus === "Fully Paid";
-          pillsHtml += `<div class="day-pill ${isPaid ? 'paid' : 'dp'}">${o.clientName.split(" ")[0]}</div>`;
+          pillsHtml += `<div class="day-pill ${isPaid ? 'paid' : 'dp'}">${(o.clientName || 'Acara').split(" ")[0]}</div>`;
         });
 
         el.innerHTML = `<span class="day-num">${day}</span>${pillsHtml}`;
         grid.appendChild(el);
       }
 
-      // Story Card List
       const storyList = document.getElementById("storyItemsList");
+      if (!storyList) return;
       storyList.innerHTML = "";
-      appData.orders.forEach(o => {
+      orders.forEach(o => {
         const isPaid = o.paymentStatus === "Fully Paid";
         storyList.innerHTML += `
           <div style="background:#fff; padding:6px 10px; border-radius:6px; border:1px solid var(--border); margin-bottom:4px; display:flex; justify-content:space-between; align-items:center; font-size:0.75rem;">
@@ -895,27 +905,57 @@
       });
     }
 
-    // --- ORDERS & INVOICE PREVIEW ---
+    // --- TAB NOTA & PESANAN (RIWAYAT TERLINDUNGI) ---
     function renderOrders() {
       const tbody = document.getElementById("ordersTableBody");
+      if (!tbody) return;
       tbody.innerHTML = "";
-      appData.orders.forEach(o => {
-        const total = o.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
-        const paid = (o.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
-        const remaining = total - paid;
-        const isPaid = remaining <= 0;
+
+      const orders = Array.isArray(appData.orders) ? appData.orders : [];
+      if (orders.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding:16px;">Belum ada pesanan yang tersimpan.</td></tr>`;
+        return;
+      }
+
+      // Render urut dari yang paling baru
+      const sortedOrders = [...orders].reverse();
+
+      sortedOrders.forEach(o => {
+        const safeItems = Array.isArray(o.items) ? o.items : [];
+        const safePayments = Array.isArray(o.payments) ? o.payments : [];
+
+        const total = safeItems.reduce((acc, it) => acc + Number(it.price || 0), 0);
+        const paid = safePayments.reduce((acc, p) => acc + Number(p.amount || 0), 0);
+        const remaining = Math.max(0, total - paid);
+        const isPaid = (total > 0 && remaining <= 0) || o.paymentStatus === "Fully Paid";
 
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>
-            <strong>${o.clientName}</strong>
-            <div style="font-size:0.68rem; color:var(--text-muted);">${o.venue}</div>
+            <strong>${o.clientName || 'Tanpa Nama'}</strong>
+            <div style="font-size:0.68rem; color:var(--text-muted);">${o.venue || '-'}</div>
+            <div style="font-size:0.62rem; color:#9c9593; margin-top:2px;">
+              ${o.lastEditedBy ? 'Riwayat: ' + o.lastEditedBy : (o.createdBy ? 'Oleh: ' + o.createdBy : '')}
+            </div>
           </td>
-          <td>${o.eventDate}</td>
-          <td>Rp ${total.toLocaleString('id-ID')}</td>
-          <td><span class="badge ${isPaid ? 'badge-paid' : 'badge-dp'}">${o.paymentStatus}</span></td>
           <td>
-            <div style="display:flex; gap:4px;">
+            ${o.eventDate || '-'}
+            <div style="font-size:0.68rem; color:var(--text-muted);">${o.setupTime || '-'} WIB</div>
+          </td>
+          <td>
+            <strong>Rp ${total.toLocaleString('id-ID')}</strong>
+            <div style="font-size:0.68rem; color:var(--text-muted);">${safeItems.length} Paket/Add-on</div>
+          </td>
+          <td>
+            <span class="badge ${isPaid ? 'badge-paid' : 'badge-dp'}">
+              ${isPaid ? 'Lunas' : (paid > 0 ? 'DP Diterima' : 'Belum Bayar')}
+            </span>
+            <div style="font-size:0.68rem; color:${isPaid ? 'var(--success)' : 'var(--danger)'}; margin-top:2px;">
+              Sisa: Rp ${remaining.toLocaleString('id-ID')}
+            </div>
+          </td>
+          <td>
+            <div style="display:flex; gap:4px; flex-wrap:wrap;">
               <button class="btn btn-secondary btn-sm" onclick="openInvoicePreview('${o.id}')">📄 Nota</button>
               <button class="btn btn-secondary btn-sm" onclick="openPaymentModal('${o.id}')">+ Bayar</button>
               <button class="btn btn-secondary btn-sm" onclick="openOrderModal('', '${o.id}')">✏️</button>
@@ -942,18 +982,18 @@
       document.getElementById("orderClientPhone").value = currentOrder ? currentOrder.phone : "";
       document.getElementById("orderEventDate").value = currentOrder ? currentOrder.eventDate : (prefillDate || "2026-11-12");
       document.getElementById("orderSetupTime").value = currentOrder ? currentOrder.setupTime : "15:00";
-      document.getElementById("orderEventTimeRange").value = currentOrder ? currentOrder.eventTimeRange : "18:00 - 21:30";
+      document.getElementById("orderEventTimeRange").value = currentOrder ? currentOrder.eventTimeRange : "18:00 • Selesai: 21:30";
       document.getElementById("orderVenue").value = currentOrder ? currentOrder.venue : "";
       document.getElementById("orderPicNotes").value = currentOrder ? currentOrder.picNotes : "";
 
-      if (currentOrder && currentOrder.items) {
+      if (currentOrder && currentOrder.items && currentOrder.items.length > 0) {
         currentOrder.items.forEach(it => addOrderItemRow(it.desc, it.price));
       } else {
         addOrderItemRow("Table Setting Romantic 2 Pax (Velvet Blush theme)", 1500000);
       }
 
       const lockedSet = new Set(currentOrder ? currentOrder.lockedItems || [] : []);
-      appData.inventory.forEach(inv => {
+      (appData.inventory || []).forEach(inv => {
         warehouseContainer.innerHTML += `
           <label style="display:block; font-size:0.75rem; margin-bottom:2px;">
             <input type="checkbox" value="${inv.id}" class="lock-item-cb" ${lockedSet.has(inv.id) ? 'checked' : ''}>
@@ -972,87 +1012,115 @@
       div.style.marginBottom = "4px";
       div.innerHTML = `
         <input type="text" class="form-control item-desc" placeholder="Deskripsi paket..." value="${desc}" style="flex:2;">
-        <input type="number" class="form-control item-price" placeholder="Harga..." value="${price}" style="flex:1;">
+        <input type="number" class="form-control item-price" placeholder="Harga Rp..." value="${price}" style="flex:1;">
         <button class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">✕</button>
       `;
       container.appendChild(div);
     }
 
+    // FUNGSI SIMPAN NOTA LENGKAP & AMAN
     function saveOrder() {
-      const orderId = document.getElementById("editOrderId").value;
-      const clientName = document.getElementById("orderClientName").value.trim();
-      const phone = document.getElementById("orderClientPhone").value.trim();
-      const eventDate = document.getElementById("orderEventDate").value;
-      const setupTime = document.getElementById("orderSetupTime").value;
-      const eventTimeRange = document.getElementById("orderEventTimeRange").value.trim();
-      const venue = document.getElementById("orderVenue").value.trim();
-      const picNotes = document.getElementById("orderPicNotes").value.trim();
+      try {
+        const orderId = document.getElementById("editOrderId") ? document.getElementById("editOrderId").value : "";
+        const clientNameEl = document.getElementById("orderClientName");
+        const eventDateEl = document.getElementById("orderEventDate");
 
-      if (!clientName || !eventDate) {
-        alert("Nama klien dan tanggal acara wajib diisi!");
-        return;
-      }
+        const clientName = clientNameEl ? clientNameEl.value.trim() : "";
+        const phone = document.getElementById("orderClientPhone") ? document.getElementById("orderClientPhone").value.trim() : "";
+        const eventDate = eventDateEl ? eventDateEl.value : "";
+        const setupTime = document.getElementById("orderSetupTime") ? document.getElementById("orderSetupTime").value : "15:00";
+        const eventTimeRange = document.getElementById("orderEventTimeRange") ? document.getElementById("orderEventTimeRange").value.trim() : "18:00 • Selesai: 21:30";
+        const venue = document.getElementById("orderVenue") ? document.getElementById("orderVenue").value.trim() : "-";
+        const picNotes = document.getElementById("orderPicNotes") ? document.getElementById("orderPicNotes").value.trim() : "";
 
-      const items = [];
-      document.querySelectorAll("#orderItemsContainer .form-row").forEach(row => {
-        const d = row.querySelector(".item-desc").value.trim();
-        const p = Number(row.querySelector(".item-price").value || 0);
-        if (d) items.push({ desc: d, price: p });
-      });
-
-      const lockedItems = [];
-      document.querySelectorAll(".lock-item-cb:checked").forEach(cb => lockedItems.push(cb.value));
-
-      const nowStr = new Date().toLocaleString("id-ID");
-
-      if (orderId) {
-        const target = appData.orders.find(o => o.id === orderId);
-        if (target) {
-          target.clientName = clientName;
-          target.phone = phone;
-          target.eventDate = eventDate;
-          target.setupTime = setupTime;
-          target.eventTimeRange = eventTimeRange;
-          target.venue = venue;
-          target.picNotes = picNotes;
-          target.items = items;
-          target.lockedItems = lockedItems;
-          target.lastEditedBy = `${activeOwner} (${nowStr})`;
+        if (!clientName) {
+          alert("Nama Klien wajib diisi!");
+          return;
         }
-      } else {
-        const newOrder = {
-          id: `#BV-${eventDate.replace(/-/g, "").slice(2, 6)}-${String(appData.orders.length + 1).padStart(3, "0")}`,
-          clientName,
-          phone,
-          eventDate,
-          setupTime,
-          eventTimeRange,
-          venue,
-          picNotes,
-          items,
-          lockedItems,
-          paymentStatus: "Belum Bayar",
-          payments: [],
-          createdBy: activeOwner,
-          lastEditedBy: `${activeOwner} (${nowStr})`,
-          hpp: { flower: 0, crew: 0, transport: 0, laundry: 0 }
-        };
-        appData.orders.push(newOrder);
-      }
+        if (!eventDate) {
+          alert("Tanggal Acara wajib dipilih!");
+          return;
+        }
 
-      closeModal("orderModal");
-      saveLocalStorage();
-      renderAll();
+        const items = [];
+        document.querySelectorAll("#orderItemsContainer .form-row").forEach(row => {
+          const descInput = row.querySelector(".item-desc");
+          const priceInput = row.querySelector(".item-price");
+          const d = descInput ? descInput.value.trim() : "";
+          const p = priceInput ? Number(priceInput.value || 0) : 0;
+          if (d) items.push({ desc: d, price: p });
+        });
+
+        if (items.length === 0) {
+          items.push({ desc: "Paket Dekorasi", price: 0 });
+        }
+
+        const lockedItems = [];
+        document.querySelectorAll(".lock-item-cb:checked").forEach(cb => lockedItems.push(cb.value));
+        const nowStr = new Date().toLocaleString("id-ID");
+
+        if (!Array.isArray(appData.orders)) appData.orders = [];
+
+        if (orderId) {
+          const target = appData.orders.find(o => o.id === orderId);
+          if (target) {
+            target.clientName = clientName;
+            target.phone = phone;
+            target.eventDate = eventDate;
+            target.setupTime = setupTime;
+            target.eventTimeRange = eventTimeRange;
+            target.venue = venue;
+            target.picNotes = picNotes;
+            target.items = items;
+            target.lockedItems = lockedItems;
+            target.lastEditedBy = `${activeOwner || 'Owner'} (${nowStr})`;
+          }
+        } else {
+          const cleanDate = eventDate.replace(/-/g, "").slice(2, 6);
+          const newId = `#BV-${cleanDate}-${String(appData.orders.length + 1).padStart(3, "0")}`;
+
+          appData.orders.push({
+            id: newId,
+            clientName,
+            phone,
+            eventDate,
+            setupTime,
+            eventTimeRange,
+            venue,
+            picNotes,
+            items,
+            lockedItems,
+            paymentStatus: "Belum Bayar",
+            payments: [],
+            createdBy: activeOwner || "Owner",
+            lastEditedBy: `${activeOwner || 'Owner'} (${nowStr})`,
+            hpp: { flower: 0, crew: 0, transport: 0, laundry: 0 }
+          });
+        }
+
+        closeModal("orderModal");
+        saveLocalStorage();
+        renderAll();
+        alert("Nota berhasil disimpan!");
+
+      } catch (err) {
+        console.error("Gagal menyimpan nota:", err);
+        alert("Gagal simpan nota: " + err.message);
+      }
     }
 
+    // --- PRATINJAU NOTA RESMI ---
     function openInvoicePreview(orderId) {
       activePreviewOrderId = orderId;
       const order = appData.orders.find(o => o.id === orderId);
       if (!order) return;
 
-      const total = order.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
-      const paid = (order.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
-      const remaining = total - paid;
+      const safeItems = Array.isArray(order.items) ? order.items : [];
+      const safePayments = Array.isArray(order.payments) ? order.payments : [];
+
+      const total = safeItems.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const paid = safePayments.reduce((acc, p) => acc + Number(p.amount || 0), 0);
+      const remaining = Math.max(0, total - paid);
 
       document.getElementById("invCodeLabel").innerText = order.id;
       document.getElementById("invDateLabel").innerText = `Tanggal: ${order.eventDate}`;
@@ -1066,7 +1134,7 @@
 
       const itemsBody = document.getElementById("invItemsListBody");
       itemsBody.innerHTML = "";
-      order.items.forEach(it => {
+      safeItems.forEach(it => {
         itemsBody.innerHTML += `
           <tr style="border-bottom:1px solid #ebdcd9;">
             <td style="padding:4px 0;">${it.desc}</td>
@@ -1087,9 +1155,9 @@
       const order = appData.orders.find(o => o.id === activePreviewOrderId);
       if (!order) return;
 
-      const total = order.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const total = (order.items || []).reduce((acc, it) => acc + Number(it.price || 0), 0);
       const paid = (order.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
-      const remaining = total - paid;
+      const remaining = Math.max(0, total - paid);
 
       const message = 
 `*OFFICIAL INVOICE BAVERLY FLORIST & DECORATION*
@@ -1101,7 +1169,7 @@ Venue: ${order.venue}
 Waktu Setup: ${order.setupTime || '-'} WIB
 
 *Rincian Paket & Add-on:*
-${order.items.map(it => `• ${it.desc} (Rp ${Number(it.price).toLocaleString('id-ID')})`).join('\n')}
+${(order.items || []).map(it => `• ${it.desc} (Rp ${Number(it.price).toLocaleString('id-ID')})`).join('\n')}
 
 *Total Biaya:* Rp ${total.toLocaleString('id-ID')}
 *Uang Muka Diterima:* Rp ${paid.toLocaleString('id-ID')}
@@ -1113,7 +1181,7 @@ ${appData.settings.bankDetails}
 Terima kasih atas kepercayaannya! ✨`;
 
       navigator.clipboard.writeText(message);
-      alert("Teks invoice resmi disalin ke clipboard!");
+      alert("Teks invoice disalin ke clipboard!");
       const cleanPhone = (order.phone || "").replace(/[^0-9]/g, "");
       window.open(`https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(message)}`, "_blank");
     }
@@ -1122,13 +1190,13 @@ Terima kasih atas kepercayaannya! ✨`;
       window.print();
     }
 
-    // --- PAYMENTS ---
+    // --- PEMBAYARAN TERMIN ---
     function openPaymentModal(orderId) {
       const order = appData.orders.find(o => o.id === orderId);
       if (!order) return;
       document.getElementById("payOrderId").value = order.id;
 
-      const total = order.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const total = (order.items || []).reduce((acc, it) => acc + Number(it.price || 0), 0);
       const paid = (order.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
       const remaining = Math.max(0, total - paid);
 
@@ -1143,7 +1211,7 @@ Terima kasih atas kepercayaannya! ✨`;
       const order = appData.orders.find(o => o.id === orderId);
       if (!order) return;
 
-      const total = order.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const total = (order.items || []).reduce((acc, it) => acc + Number(it.price || 0), 0);
       const paid = (order.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
       const remaining = Math.max(0, total - paid);
 
@@ -1158,11 +1226,11 @@ Terima kasih atas kepercayaannya! ✨`;
       const order = appData.orders.find(o => o.id === orderId);
       if (!order || amount <= 0) return;
 
-      if (!order.payments) order.payments = [];
+      if (!Array.isArray(order.payments)) order.payments = [];
       const nowStr = new Date().toLocaleString("id-ID");
       order.payments.push({ type, amount, date: nowStr, by: activeOwner });
 
-      const total = order.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const total = (order.items || []).reduce((acc, it) => acc + Number(it.price || 0), 0);
       const paid = order.payments.reduce((acc, p) => acc + Number(p.amount || 0), 0);
       order.paymentStatus = (paid >= total) ? "Fully Paid" : `${type} Paid`;
       order.lastEditedBy = `${activeOwner} (${nowStr})`;
@@ -1170,14 +1238,15 @@ Terima kasih atas kepercayaannya! ✨`;
       closeModal("paymentModal");
       saveLocalStorage();
       renderAll();
-      alert(`Pembayaran ${type} Rp ${amount.toLocaleString('id-ID')} dicatat oleh ${activeOwner}`);
+      alert(`Pembayaran ${type} sebesar Rp ${amount.toLocaleString('id-ID')} dicatat oleh ${activeOwner}`);
     }
 
-    // --- INVENTORY ---
+    // --- INVENTARIS GUDANG ---
     function renderInventory() {
       const tbody = document.getElementById("inventoryTableBody");
+      if (!tbody) return;
       tbody.innerHTML = "";
-      appData.inventory.forEach(inv => {
+      (appData.inventory || []).forEach(inv => {
         const available = Math.max(0, inv.total - (inv.inLaundry || 0));
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -1244,6 +1313,8 @@ Terima kasih atas kepercayaannya! ✨`;
       const total = Number(document.getElementById("invTotal").value || 1);
 
       if (!name) return;
+      if (!Array.isArray(appData.inventory)) appData.inventory = [];
+
       if (invId) {
         const item = appData.inventory.find(i => i.id === invId);
         if (item) {
@@ -1277,19 +1348,20 @@ Terima kasih atas kepercayaannya! ✨`;
       renderInventory();
     }
 
-    // --- FINANCE, DIAGRAM & HPP ---
-    function renderFinance() {
-      const selectedMonth = document.getElementById("financeMonthFilter").value; // e.g. "2026-11"
-      
+    // --- TAB LAPORAN KEUANGAN, DIAGRAM & HPP ---
+    function renderFinanceTab() {
+      const selectMonthEl = document.getElementById("financeMonthSelect");
+      const selectedMonth = selectMonthEl ? selectMonthEl.value : "2026-11";
+
       let cashIn = 0;
       let receivables = 0;
 
-      // Filter Orders
-      appData.orders.forEach(o => {
-        const total = o.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const orders = Array.isArray(appData.orders) ? appData.orders : [];
+
+      orders.forEach(o => {
+        const total = (o.items || []).reduce((acc, it) => acc + Number(it.price || 0), 0);
         const orderPaid = (o.payments || []).reduce((acc, p) => acc + Number(p.amount || 0), 0);
-        
-        // Pemasukan riil berdasarkan tanggal pembayaran masuk
+
         (o.payments || []).forEach(p => {
           if (p.date && p.date.startsWith(selectedMonth)) {
             cashIn += Number(p.amount || 0);
@@ -1301,23 +1373,24 @@ Terima kasih atas kepercayaannya! ✨`;
         }
       });
 
-      // Filter Expenses
       let cashOut = 0;
       const expBody = document.getElementById("expensesTableBody");
-      expBody.innerHTML = "";
+      if (expBody) expBody.innerHTML = "";
 
-      appData.expenses.forEach(e => {
+      const expenses = Array.isArray(appData.expenses) ? appData.expenses : [];
+      expenses.forEach(e => {
         if (e.date && e.date.startsWith(selectedMonth)) {
           cashOut += Number(e.amount || 0);
-          expBody.innerHTML += `
-            <tr>
-              <td>${e.date}</td>
-              <td>${e.desc}</td>
-              <td>${e.category}</td>
-              <td>Rp ${Number(e.amount).toLocaleString('id-ID')}</td>
-              <td>${e.by || 'Owner'}</td>
-            </tr>
-          `;
+          if (expBody) {
+            expBody.innerHTML += `
+              <tr>
+                <td>${e.date}</td>
+                <td><strong>${e.category}</strong><br><span style="color:var(--text-muted); font-size:0.7rem;">${e.desc}</span></td>
+                <td style="color:var(--danger); font-weight:700;">-Rp ${Number(e.amount).toLocaleString('id-ID')}</td>
+                <td>${e.by || 'Owner'}</td>
+              </tr>
+            `;
+          }
         }
       });
 
@@ -1325,49 +1398,55 @@ Terima kasih atas kepercayaannya! ✨`;
 
       document.getElementById("metricCashIn").innerText = `Rp ${cashIn.toLocaleString('id-ID')}`;
       document.getElementById("metricCashOut").innerText = `Rp ${cashOut.toLocaleString('id-ID')}`;
-      document.getElementById("metricNetProfit").innerText = `Rp ${netProfit.toLocaleString('id-ID')}`;
+      document.getElementById("metricNetProfit").innerText = `${netProfit >= 0 ? '+' : ''}Rp ${netProfit.toLocaleString('id-ID')}`;
       document.getElementById("metricReceivables").innerText = `Rp ${receivables.toLocaleString('id-ID')}`;
 
-      // Render Visual Bar Chart
-      const maxVal = Math.max(cashIn, cashOut, Math.abs(netProfit), 1000000);
-      document.getElementById("chartBarIn").style.height = `${Math.min(100, Math.max(5, (cashIn / maxVal) * 100))}%`;
-      document.getElementById("chartBarOut").style.height = `${Math.min(100, Math.max(5, (cashOut / maxVal) * 100))}%`;
-      document.getElementById("chartBarProfit").style.height = `${Math.min(100, Math.max(5, (Math.max(0, netProfit) / maxVal) * 100))}%`;
+      // Update Diagram Batang
+      const maxBar = Math.max(cashIn, cashOut, Math.abs(netProfit), 100000);
+      const inHeight = Math.max(5, (cashIn / maxBar) * 100);
+      const outHeight = Math.max(5, (cashOut / maxBar) * 100);
+      const profitHeight = Math.max(5, (Math.max(0, netProfit) / maxBar) * 100);
 
-      // Comparison Calculation with previous month
-      calculateMonthComparison(selectedMonth, cashIn);
+      document.getElementById("barIn").style.height = `${inHeight}%`;
+      document.getElementById("barOut").style.height = `${outHeight}%`;
+      document.getElementById("barProfit").style.height = `${profitHeight}%`;
 
-      // Populate HPP select
-      const hppSelect = document.getElementById("hppOrderSelect");
-      hppSelect.innerHTML = `<option value="">-- Pilih Acara --</option>`;
-      appData.orders.forEach(o => {
-        hppSelect.innerHTML += `<option value="${o.id}">${o.clientName} (${o.eventDate})</option>`;
-      });
-    }
+      document.getElementById("barValIn").innerText = `Rp ${cashIn.toLocaleString('id-ID')}`;
+      document.getElementById("barValOut").innerText = `Rp ${cashOut.toLocaleString('id-ID')}`;
+      document.getElementById("barValProfit").innerText = `Rp ${netProfit.toLocaleString('id-ID')}`;
 
-    function calculateMonthComparison(currentMonthStr, currentCashIn) {
-      const parts = currentMonthStr.split("-");
-      let year = parseInt(parts[0], 10);
-      let month = parseInt(parts[1], 10) - 1;
-      if (month === 0) { month = 12; year -= 1; }
-      const prevMonthStr = `${year}-${String(month).padStart(2, "0")}`;
+      // Komparasi Month-over-Month
+      const parts = selectedMonth.split("-");
+      let y = parseInt(parts[0], 10);
+      let m = parseInt(parts[1], 10) - 1;
+      if (m === 0) { m = 12; y -= 1; }
+      const prevMonthStr = `${y}-${String(m).padStart(2, "0")}`;
 
       let prevCashIn = 0;
-      appData.orders.forEach(o => {
+      orders.forEach(o => {
         (o.payments || []).forEach(p => {
           if (p.date && p.date.startsWith(prevMonthStr)) prevCashIn += Number(p.amount || 0);
         });
       });
 
-      const label = document.getElementById("monthCompareResult");
-      if (prevCashIn === 0) {
-        label.innerText = `Kas Masuk bulan ini Rp ${currentCashIn.toLocaleString('id-ID')} (Data ${prevMonthStr} belum ada pembanding)`;
-      } else {
-        const diff = currentCashIn - prevCashIn;
+      const growthBadge = document.getElementById("growthBadge");
+      if (prevCashIn > 0) {
+        const diff = cashIn - prevCashIn;
         const pct = ((diff / prevCashIn) * 100).toFixed(1);
-        const sign = diff >= 0 ? "+" : "";
-        label.innerText = `${sign}${pct}% vs ${prevMonthStr} (Selisih: ${sign}Rp ${diff.toLocaleString('id-ID')})`;
-        label.style.color = diff >= 0 ? "var(--success)" : "var(--danger)";
+        growthBadge.innerText = `${diff >= 0 ? '+' : ''}${pct}% vs ${prevMonthStr}`;
+        growthBadge.style.color = diff >= 0 ? "var(--success)" : "var(--danger)";
+      } else {
+        growthBadge.innerText = `Belum ada pembanding (${prevMonthStr})`;
+        growthBadge.style.color = "var(--text-muted)";
+      }
+
+      // Populate HPP select
+      const hppSelect = document.getElementById("hppOrderSelect");
+      if (hppSelect) {
+        hppSelect.innerHTML = `<option value="">-- Pilih Acara --</option>`;
+        orders.forEach(o => {
+          hppSelect.innerHTML += `<option value="${o.id}">${o.clientName} (${o.eventDate})</option>`;
+        });
       }
     }
 
@@ -1375,10 +1454,14 @@ Terima kasih atas kepercayaannya! ✨`;
       const desc = document.getElementById("expDescInput").value.trim();
       const cat = document.getElementById("expCategorySelect").value;
       const amount = Number(document.getElementById("expAmountInput").value || 0);
-      const selectedMonth = document.getElementById("financeMonthFilter").value;
+      const selectedMonth = document.getElementById("financeMonthSelect").value;
 
-      if (!desc || amount <= 0) return;
+      if (!desc || amount <= 0) {
+        alert("Keterangan dan nominal pengeluaran wajib diisi!");
+        return;
+      }
 
+      if (!Array.isArray(appData.expenses)) appData.expenses = [];
       appData.expenses.unshift({
         id: `EXP-${Date.now().toString().slice(-4)}`,
         desc, category: cat, amount,
@@ -1389,7 +1472,7 @@ Terima kasih atas kepercayaannya! ✨`;
       document.getElementById("expDescInput").value = "";
       document.getElementById("expAmountInput").value = "";
       saveLocalStorage();
-      renderFinance();
+      renderFinanceTab();
     }
 
     function loadHppData() {
@@ -1415,7 +1498,7 @@ Terima kasih atas kepercayaannya! ✨`;
       const l = Number(document.getElementById("hppLaundryCost").value || 0);
 
       order.hpp = { flower: f, crew: c, transport: t, laundry: l };
-      const contract = order.items.reduce((acc, it) => acc + Number(it.price || 0), 0);
+      const contract = (order.items || []).reduce((acc, it) => acc + Number(it.price || 0), 0);
       const cost = f + c + t + l;
       const profit = contract - cost;
       const pct = contract > 0 ? ((profit / contract) * 100).toFixed(1) : 0;
@@ -1425,22 +1508,22 @@ Terima kasih atas kepercayaannya! ✨`;
     }
 
     function exportExpensesCSV() {
-      let csv = "ID,Tanggal,Keterangan,Kategori,Nominal,Oleh\n";
-      appData.expenses.forEach(e => {
-        csv += `"${e.id}","${e.date}","${e.desc}","${e.category}",${e.amount},"${e.by}"\n`;
+      let csv = "ID,Tanggal,Kategori,Keterangan,Nominal,Dicatat Oleh\n";
+      (appData.expenses || []).forEach(e => {
+        csv += `"${e.id}","${e.date}","${e.category}","${e.desc}",${e.amount},"${e.by}"\n`;
       });
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `Buku_Pengeluaran_Baverly_${Date.now()}.csv`;
+      a.download = `Buku_Kas_Baverly_${Date.now()}.csv`;
       a.click();
     }
 
-    // --- SETTINGS ---
+    // --- PENGATURAN & BACKUP ---
     function loadSettings() {
-      document.getElementById("setBankDetails").value = appData.settings.bankDetails;
-      document.getElementById("setWaNumber").value = appData.settings.waNumber;
-      document.getElementById("setTerms").value = appData.settings.terms;
+      document.getElementById("setBankDetails").value = appData.settings.bankDetails || "";
+      document.getElementById("setWaNumber").value = appData.settings.waNumber || "";
+      document.getElementById("setTerms").value = appData.settings.terms || "";
     }
 
     function saveSettings() {
@@ -1448,7 +1531,7 @@ Terima kasih atas kepercayaannya! ✨`;
       appData.settings.waNumber = document.getElementById("setWaNumber").value.trim();
       appData.settings.terms = document.getElementById("setTerms").value.trim();
       saveLocalStorage();
-      alert("Pengaturan rekening & T&C disimpan!");
+      alert("Pengaturan rekening & T&C berhasil disimpan!");
     }
 
     function exportDataJson() {
