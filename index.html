@@ -271,7 +271,7 @@
       </div>
     </section>
 
-    <!-- 2. TAB NOTA & PESANAN (RIWAYAT LENGKAP) -->
+    <!-- 2. TAB NOTA & PESANAN (RIWAYAT LENGKAP & BISA DIHAPUS) -->
     <section id="tabOrders" class="tab-content">
       <div class="card">
         <div class="card-title">
@@ -580,6 +580,7 @@
         <div style="display:flex; gap:6px; align-items:center;">
           <button class="btn btn-sm" style="background:#15803d; color:#fff;" onclick="sendCurrentInvoiceWA()">Kirim WhatsApp</button>
           <button class="btn btn-sm" style="background:#c47c72; color:#fff;" onclick="triggerPrintInvoice()">Cetak / PDF</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCurrentInvoice()" title="Hapus Nota Ini">🗑️ Hapus</button>
           <button class="close-btn" onclick="closeModal('previewInvoiceModal')">&times;</button>
         </div>
       </div>
@@ -905,7 +906,7 @@
       });
     }
 
-    // --- TAB NOTA & PESANAN (RIWAYAT TERLINDUNGI) ---
+    // --- TAB NOTA & PESANAN (DILENGKAPI TOMBOL HAPUS) ---
     function renderOrders() {
       const tbody = document.getElementById("ordersTableBody");
       if (!tbody) return;
@@ -917,7 +918,6 @@
         return;
       }
 
-      // Render urut dari yang paling baru
       const sortedOrders = [...orders].reverse();
 
       sortedOrders.forEach(o => {
@@ -959,11 +959,33 @@
               <button class="btn btn-secondary btn-sm" onclick="openInvoicePreview('${o.id}')">📄 Nota</button>
               <button class="btn btn-secondary btn-sm" onclick="openPaymentModal('${o.id}')">+ Bayar</button>
               <button class="btn btn-secondary btn-sm" onclick="openOrderModal('', '${o.id}')">✏️</button>
+              <button class="btn btn-danger btn-sm" onclick="deleteOrder('${o.id}')" title="Hapus Nota">🗑️</button>
             </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // FUNGSI HAPUS NOTA
+    function deleteOrder(orderId) {
+      const order = appData.orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const confirmDelete = confirm(`Apakah kamu yakin ingin menghapus nota "${order.clientName}" (${order.id})?\n\nCatatan: Data yang dihapus akan otomatis tersinkronisasi ke perangkat lain.`);
+      if (confirmDelete) {
+        appData.orders = appData.orders.filter(o => o.id !== orderId);
+        saveLocalStorage();
+        renderAll();
+        closeModal("previewInvoiceModal");
+        alert("Nota berhasil dihapus!");
+      }
+    }
+
+    function deleteCurrentInvoice() {
+      if (activePreviewOrderId) {
+        deleteOrder(activePreviewOrderId);
+      }
     }
 
     function openOrderModal(prefillDate = "", orderId = "") {
@@ -1018,7 +1040,6 @@
       container.appendChild(div);
     }
 
-    // FUNGSI SIMPAN NOTA LENGKAP & AMAN
     function saveOrder() {
       try {
         const orderId = document.getElementById("editOrderId") ? document.getElementById("editOrderId").value : "";
